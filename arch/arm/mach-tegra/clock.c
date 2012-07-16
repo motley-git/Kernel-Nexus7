@@ -684,7 +684,10 @@ void __init tegra_init_max_rate(struct clk *c, unsigned long max_rate)
 
 	pr_warning("Lowering %s maximum rate from %lu to %lu\n",
 		c->name, c->max_rate, max_rate);
-
+	if(!strncmp(c->name,"cpu_g",strlen("cpu_g"))){
+		pr_warning("Keep max_rate of %s  as %lu \n",c->name, c->max_rate);
+		return;
+	}
 	c->max_rate = max_rate;
 	list_for_each_entry(shared_bus_user,
 			    &c->shared_bus_list, u.shared_bus_user.node) {

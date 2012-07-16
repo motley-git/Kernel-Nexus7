@@ -291,13 +291,13 @@ static void tegra_auto_hotplug_work_func(struct work_struct *work)
 
 	if (cpu < nr_cpu_ids) {
 		if (up){
-			printk("cpu_up(%u)+\n",cpu);
+			pr_debug("cpu_up(%u)+\n",cpu);
 			cpu_up(cpu);
-			printk("cpu_up(%u)-\n",cpu);
+			pr_debug("cpu_up(%u)-\n",cpu);
 		}else{
-			printk("cpu_down(%u)+\n",cpu);
+			pr_debug("cpu_down(%u)+\n",cpu);
 			cpu_down(cpu);
-			printk("cpu_down(%u)-\n",cpu);
+			pr_debug("cpu_down(%u)-\n",cpu);
 		}
 	}
 }

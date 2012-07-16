@@ -33,7 +33,7 @@ static bool tegra_dvfs_core_disabled;
 static struct dvfs *cpu_dvfs;
 
 static const int cpu_millivolts[MAX_DVFS_FREQS] = {
-	800, 825, 850, 875, 900, 912, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1212, 1237};
+	800, 825, 850, 875, 900, 912, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1165, 1185, 1200, 1237};
 
 static const unsigned int cpu_cold_offs_mhz[MAX_DVFS_FREQS] = {
 	  50,  50,  50,  50,  50,  50,  50,  50,  50,   50,   50,   50,   50,   50,   50,   50,   50,   50};
@@ -82,8 +82,9 @@ static int tegra3_get_core_floor_mv(int cpu_mv)
 	if ((tegra_cpu_speedo_id() < 2) ||
 	    (tegra_cpu_speedo_id() == 4) ||
 	    (tegra_cpu_speedo_id() == 7) ||
-	    (tegra_cpu_speedo_id() == 8))
+	    (tegra_cpu_speedo_id() == 8)) {
 		return 1200;
+	}
 	if (cpu_mv < 1100)
 		return 1200;
 	if (cpu_mv <= 1250)
@@ -173,10 +174,10 @@ static struct dvfs cpu_dvfs_table[] = {
 
 	CPU_DVFS("cpu_g",  7, 0, MHZ, 460, 460, 550, 550,  680,  680,  820,  970, 1040, 1080, 1150, 1200, 1280, 1300),
 	CPU_DVFS("cpu_g",  7, 1, MHZ, 480, 480, 650, 650,  780,  780,  990, 1040, 1100, 1200, 1300),
-	CPU_DVFS("cpu_g",  7, 2, MHZ, 520, 520, 700, 700,  860,  860, 1050, 1150, 1200, 1300),
+	CPU_DVFS("cpu_g",  7, 2, MHZ, 520, 520, 700, 700,  860,  860, 1050, 1150, 1200, 1240, 1280, 1320, 1360, 1360, 1500, 1540, 1600),
 	CPU_DVFS("cpu_g",  7, 3, MHZ, 550, 550, 770, 770,  910,  910, 1150, 1230, 1300),
 	CPU_DVFS("cpu_g",  7, 4, MHZ, 550, 550, 770, 770,  940,  940, 1160, 1300),
-
+	
 	CPU_DVFS("cpu_g",  8, 0, MHZ, 460, 460, 550, 550,  680,  680,  820,  970, 1040, 1080, 1150, 1200, 1280, 1300),
 	CPU_DVFS("cpu_g",  8, 1, MHZ, 480, 480, 650, 650,  780,  780,  990, 1040, 1100, 1200, 1300),
 	CPU_DVFS("cpu_g",  8, 2, MHZ, 520, 520, 700, 700,  860,  860, 1050, 1150, 1200, 1300),
@@ -511,6 +512,7 @@ static int __init get_cpu_nominal_mv_index(
 	 * result to the nominal cpu level for the chips with this speedo_id.
 	 */
 	mv = tegra3_dvfs_rail_vdd_core.nominal_millivolts;
+	printk("tegra3_speedo: tegra3_dvfs_rail_vdd_core.nominal_millivolts mV for cpu_speedo_id:%u is %umV\n",speedo_id,mv);
 	for (i = 0; i < MAX_DVFS_FREQS; i++) {
 		if ((cpu_millivolts[i] == 0) ||
 		    tegra3_get_core_floor_mv(cpu_millivolts[i]) > mv)
@@ -520,6 +522,8 @@ static int __init get_cpu_nominal_mv_index(
 	mv = cpu_millivolts[i - 1];
 	BUG_ON(mv < tegra3_dvfs_rail_vdd_cpu.min_millivolts);
 	mv = min(mv, tegra_cpu_speedo_mv());
+
+	printk("tegra3_speedo: nominal mV for cpu_speedo_id:%u is %umV",speedo_id,mv);
 
 	/*
 	 * Find matching cpu dvfs entry, and use it to determine index to the
