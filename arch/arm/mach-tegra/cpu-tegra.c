@@ -58,6 +58,10 @@ static int suspend_index;
 
 static bool force_policy_max;
 
+#define TEGRA3_OVERCLOCK
+#define TEGRA3_DYNAMIC_EDP_THRES_TEMP (60)
+static bool edp_enable = 0;
+
 static int force_policy_max_set(const char *arg, const struct kernel_param *kp)
 {
 	int ret;
@@ -220,6 +224,16 @@ int tegra_edp_update_thermal_zone(int temperature)
 	int nlimits = cpu_edp_limits_size;
 	int index;
 
+#ifdef TEGRA3_OVERCLOCK
+	if(temperature >= TEGRA3_DYNAMIC_EDP_THRES_TEMP) {
+		edp_enable = 1;
+		pr_info("%s: Dynamic EDP enabled, temp: %u\n", __func__, temperature);
+	} else {
+		edp_enable = 0;
+		pr_info("%s: Dynamic EDP disabled, temp: %u\n", __func__, temperature);
+	}
+#endif
+
 	if (!cpu_edp_limits)
 		return -EINVAL;
 
@@ -324,7 +338,16 @@ static int tegra_cpu_edp_notify(
 		edp_update_limit();
 
 		cpu_speed = tegra_getspeed(0);
+
+#ifdef TEGRA3_OVERCLOCK
+		if(edp_enable) {
+			pr_info("%s: tegra_cpu_edp_notify(). Dynamic EDP is enabled.\n", __func__);
+			new_speed = edp_governor_speed(new_speed);
+			pr_info("%s: tegra_cpu_edp_notify(). Dynamic EDP is disabled.\n", __func__);
+		}
+#else
 		new_speed = edp_governor_speed(cpu_speed);
+#endif
 		if (new_speed < cpu_speed) {
 			ret = tegra_cpu_set_speed_cap(NULL);
 			if (ret) {
@@ -584,7 +607,15 @@ int tegra_cpu_set_speed_cap(unsigned int *speed_cap)
 		return -EBUSY;
 
 	new_speed = tegra_throttle_governor_speed(new_speed);
+
+#ifdef TEGRA3_OVERCLOCK
+	if(edp_enable) {
+		new_speed = edp_governor_speed(new_speed);
+	}
+#else
 	new_speed = edp_governor_speed(new_speed);
+#endif	
+
 	new_speed = user_cap_speed(new_speed);
 	if (speed_cap)
 		*speed_cap = new_speed;
@@ -604,7 +635,14 @@ int tegra_suspended_target(unsigned int target_freq)
 
 	/* apply only "hard" caps */
 	new_speed = tegra_throttle_governor_speed(new_speed);
+#ifdef TEGRA3_OVERCLOCK
+	if(edp_enable) {
+		pr_info("%s : Dynamic EDP is enabled\n", __func__);
+		new_speed = edp_governor_speed(new_speed);
+	}
+#else
 	new_speed = edp_governor_speed(new_speed);
+#endif
 
 	return tegra_update_cpu_speed(new_speed);
 }
