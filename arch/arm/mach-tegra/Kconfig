@@ -270,6 +270,13 @@ config TEGRA_EMC_SCALING_ENABLE
 	depends on TEGRA_SILICON_PLATFORM
 	default n
 
+config VOLTAGE_CONTROL
+	bool "Enable user voltage control on Tegra CPU"
+	depends on TEGRA_SILICON_PLATFORM
+	default n
+	help
+	User custom voltage control interface
+
 config TEGRA_CPU_DVFS
 	bool "Enable voltage scaling on Tegra CPU"
 	depends on TEGRA_SILICON_PLATFORM

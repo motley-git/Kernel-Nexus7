@@ -28,12 +28,17 @@
 #include "board.h"
 #include "tegra3_emc.h"
 
+#ifdef CONFIG_VOLTAGE_CONTROL
+int user_mv_table[MAX_DVFS_FREQS] = {
+	800, 825, 850, 875, 900, 912, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1165, 1185, 1200, 1237};
+#endif
+
 static bool tegra_dvfs_cpu_disabled;
 static bool tegra_dvfs_core_disabled;
 static struct dvfs *cpu_dvfs;
 
 static const int cpu_millivolts[MAX_DVFS_FREQS] = {
-	800, 825, 850, 875, 900, 912, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1165, 1185, 1200, 1237};
+	800, 825, 850, 875, 900, 912, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1190, 1200, 1237};
 
 static const unsigned int cpu_cold_offs_mhz[MAX_DVFS_FREQS] = {
 	  50,  50,  50,  50,  50,  50,  50,  50,  50,   50,   50,   50,   50,   50,   50,   50,   50,   50};
@@ -511,7 +516,7 @@ static int __init get_cpu_nominal_mv_index(
 	 * result to the nominal cpu level for the chips with this speedo_id.
 	 */
 	mv = tegra3_dvfs_rail_vdd_core.nominal_millivolts;
-	printk("tegra3_speedo: tegra3_dvfs_rail_vdd_core.nominal_millivolts mV for cpu_speedo_id:%u is %umV\n",speedo_id,mv);
+	pr_info("tegra3_dvfs: %s: tegra3_dvfs_rail_vdd_core.nominal_millivolts mV for cpu_speedo_id: %u is %umV\n",__func__,speedo_id,mv);
 	for (i = 0; i < MAX_DVFS_FREQS; i++) {
 		if ((cpu_millivolts[i] == 0) ||
 		    tegra3_get_core_floor_mv(cpu_millivolts[i]) > mv)
@@ -519,10 +524,10 @@ static int __init get_cpu_nominal_mv_index(
 	}
 	BUG_ON(i == 0);
 	mv = cpu_millivolts[i - 1];
+	pr_info("tegra3_dvfs: %s: cpu mv: %i\n", __func__, mv);
 	BUG_ON(mv < tegra3_dvfs_rail_vdd_cpu.min_millivolts);
 	mv = min(mv, tegra_cpu_speedo_mv());
-
-	printk("tegra3_speedo: nominal mV for cpu_speedo_id:%u is %umV",speedo_id,mv);
+	pr_info("tegra3_dvfs: %s: nominal mV for cpu_speedo_id:%u is %umV\n",__func__,speedo_id,mv);
 
 	/*
 	 * Find matching cpu dvfs entry, and use it to determine index to the
@@ -561,6 +566,7 @@ static int __init get_cpu_nominal_mv_index(
 		       speedo_id, process_id, d->freqs[i-1] * d->freqs_mult);
 
 	*cpu_dvfs = d;
+	pr_info("tegra3_dvfs: %s: cpu_nominal_mv_index: %i\n",__func__, i - 1);
 	return (i - 1);
 }
 
