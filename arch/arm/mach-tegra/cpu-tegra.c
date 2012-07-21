@@ -339,15 +339,8 @@ static int tegra_cpu_edp_notify(
 
 		cpu_speed = tegra_getspeed(0);
 
-#ifdef TEGRA3_OVERCLOCK
-		if(edp_enable) {
-			pr_info("%s: tegra_cpu_edp_notify(). Dynamic EDP is enabled.\n", __func__);
-			new_speed = edp_governor_speed(new_speed);
-			pr_info("%s: tegra_cpu_edp_notify(). Dynamic EDP is disabled.\n", __func__);
-		}
-#else
 		new_speed = edp_governor_speed(cpu_speed);
-#endif
+
 		if (new_speed < cpu_speed) {
 			ret = tegra_cpu_set_speed_cap(NULL);
 			if (ret) {
