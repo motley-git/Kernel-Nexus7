@@ -56,11 +56,11 @@ static DEFINE_MUTEX(tegra_cpu_lock);
 static bool is_suspended;
 static int suspend_index;
 
-static bool force_policy_max;
+static bool force_policy_max = 1;
 
 #define TEGRA3_OVERCLOCK
 #define TEGRA3_DYNAMIC_EDP_THRES_TEMP (60)
-static bool edp_enable = 0;
+static bool edp_enable = 1;
 
 static int force_policy_max_set(const char *arg, const struct kernel_param *kp)
 {
