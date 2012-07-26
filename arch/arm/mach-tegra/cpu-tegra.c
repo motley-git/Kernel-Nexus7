@@ -338,9 +338,16 @@ static int tegra_cpu_edp_notify(
 		edp_update_limit();
 
 		cpu_speed = tegra_getspeed(0);
-
+		
+#ifdef TEGRA3_OVERCLOCK
+		if(edp_enable) {
+			new_speed = edp_governor_speed(new_speed);
+		} else {
+			new_speed = cpu_speed;
+		}
+#else
 		new_speed = edp_governor_speed(cpu_speed);
-
+#endif
 		if (new_speed < cpu_speed) {
 			ret = tegra_cpu_set_speed_cap(NULL);
 			if (ret) {
