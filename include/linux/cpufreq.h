@@ -370,6 +370,9 @@ extern struct cpufreq_governor cpufreq_gov_conservative;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE)
 extern struct cpufreq_governor cpufreq_gov_interactive;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_interactive)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_PEGASUSQ)
+extern struct cpufreq_governor cpufreq_gov_pegasusq;
+#define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_pegasusq)
 #endif
 
 
