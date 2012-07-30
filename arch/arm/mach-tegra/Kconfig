@@ -282,8 +282,31 @@ config GPU_OVERCLOCK
 	depends on TEGRA_SILICON_PLATFORM
 	default n
 	help
-	Choose y to overclock the GPU
+	Choose y to overclock the GPU. 
+	If Off, clock speed is 416MHz.
+	If On, GPU clock speed can be selected.
 
+choice
+
+	depends on GPU_OVERCLOCK
+	prompt "Maximum GPU Rate"
+	default GPU_OC_484
+	---help---
+	  Select the desired GPU overclock rate.
+
+	  If you are not sure what you are doing, leave this
+	  option alone!
+	config GPU_OC_446
+		bool "446 MHz"
+	config GPU_OC_484
+		bool "484 MHz"
+	config GPU_OC_500
+		bool "500 MHz"
+	config GPU_OC_520
+		bool "520 MHz"
+
+endchoice
+	  
 config TEGRA_CPU_DVFS
 	bool "Enable voltage scaling on Tegra CPU"
 	depends on TEGRA_SILICON_PLATFORM
