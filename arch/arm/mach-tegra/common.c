@@ -103,7 +103,7 @@ static struct board_info pmu_board_info;
 static struct board_info display_board_info;
 static struct board_info camera_board_info;
 
-static int pmu_core_edp = 1200;	/* default 1.2V EDP limit */
+static int pmu_core_edp = 1250;	/* default 1.2V EDP limit */
 static int board_panel_type;
 static enum power_supply_type pow_supply_type = POWER_SUPPLY_TYPE_MAINS;
 
@@ -560,6 +560,7 @@ static int __init tegra_pmu_core_edp(char *options)
 {
 	char *p = options;
 	int core_edp = memparse(p, &p);
+	printk("tegra common core_edp: %u\n",core_edp);
 	if (core_edp != 0)
 		pmu_core_edp = core_edp;
 	return 0;
