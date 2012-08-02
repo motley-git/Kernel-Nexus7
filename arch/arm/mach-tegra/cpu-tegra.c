@@ -736,6 +736,9 @@ static int tegra_cpu_init(struct cpufreq_policy *policy)
 		register_pm_notifier(&tegra_cpu_pm_notifier);
 	}
 
+	/* set to 1.3GHz stock freq on init */
+	policy->max = 1300000;
+
 	return 0;
 }
 
