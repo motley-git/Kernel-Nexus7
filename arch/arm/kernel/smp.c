@@ -315,6 +315,9 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 	 */
 	set_cpu_online(cpu, true);
 
+	while (!cpu_active(cpu))
+		 cpu_relax();
+
 	/*
 	 * Setup the percpu timer for this CPU.
 	 */
