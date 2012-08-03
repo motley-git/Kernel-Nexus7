@@ -377,9 +377,24 @@ static struct resource grouper_disp2_resources[] = {
 #endif
 
 static struct tegra_dc_mode grouper_panel_modes[] = {
-	{
-		/* 1280x800@60Hz */
+{
+#ifdef CONFIG_GPU_OVERCLOCK
+#ifdef CONFIG_GPU_OC_446
+		/* 1280x800@62Hz */
 		.pclk = 74180000,
+#endif
+#ifdef CONFIG_GPU_OC_484
+		/* 1280x800@63Hz */
+		.pclk = 77395348,
+#endif
+#ifdef CONFIG_GPU_OC_520
+		/* 1280x800@65Hz */
+		.pclk = 81170731,
+#endif
+#else
+	/* 1280x800@60Hz */
+	.pclk = 74180000,
+#endif
 		.h_ref_to_sync = 1,
 		.v_ref_to_sync = 1,
 		.h_sync_width = 24,

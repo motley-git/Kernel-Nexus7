@@ -41,7 +41,7 @@
 #define INITIAL_STATE		TEGRA_HP_DISABLED
 #define UP2G0_DELAY_MS		70
 #define UP2Gn_DELAY_MS		100
-#define DOWN_DELAY_MS		1000
+#define DOWN_DELAY_MS		750
 
 static struct mutex *tegra3_cpu_lock;
 
@@ -66,7 +66,7 @@ module_param(idle_bottom_freq, uint, 0644);
 static int mp_overhead = 10;
 module_param(mp_overhead, int, 0644);
 
-static int balance_level = 75;
+static int balance_level = 60;
 module_param(balance_level, int, 0644);
 
 static struct clk *cpu_clk;
@@ -189,11 +189,22 @@ enum {
 static noinline int tegra_cpu_speed_balance(void)
 {
 	unsigned long highest_speed = tegra_cpu_highest_speed();
-	unsigned long balanced_speed = highest_speed * balance_level / 100;
-	unsigned long skewed_speed = balanced_speed / 2;
 	unsigned int nr_cpus = num_online_cpus();
 	unsigned int max_cpus = pm_qos_request(PM_QOS_MAX_ONLINE_CPUS) ? : 4;
 	unsigned int min_cpus = pm_qos_request(PM_QOS_MIN_ONLINE_CPUS);
+	unsigned long balanced_speed;
+
+	switch (highest_speed) {
+	case 1700000:
+	case 1600000:
+	case 1500000:
+		balanced_speed = 860000;
+		break;
+	default:
+		highest_speed * balance_level / 100;
+	}
+
+	unsigned long skewed_speed = balanced_speed / 2;
 
 	/* balanced: freq targets for all CPUs are above 50% of highest speed
 	   biased: freq target for at least one CPU is below 50% threshold

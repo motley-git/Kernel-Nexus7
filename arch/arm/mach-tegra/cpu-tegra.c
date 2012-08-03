@@ -733,11 +733,10 @@ static int tegra_cpu_init(struct cpufreq_policy *policy)
 	cpumask_copy(policy->related_cpus, cpu_possible_mask);
 
 	if (policy->cpu == 0) {
+		/* set to 1.3GHz stock freq on init */
+		policy->max = 1300000;
 		register_pm_notifier(&tegra_cpu_pm_notifier);
 	}
-
-	/* set to 1.3GHz stock freq on init */
-	policy->max = 1300000;
 
 	return 0;
 }
