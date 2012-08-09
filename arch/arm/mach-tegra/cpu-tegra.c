@@ -59,7 +59,7 @@ static int suspend_index;
 static bool force_policy_max = 1;
 
 #define TEGRA3_OVERCLOCK
-#define TEGRA3_DYNAMIC_EDP_THRES_TEMP (60)
+#define TEGRA3_DYNAMIC_EDP_THRES_TEMP (67)
 static bool edp_enable = 1;
 
 static int force_policy_max_set(const char *arg, const struct kernel_param *kp)
@@ -727,7 +727,7 @@ static int tegra_cpu_init(struct cpufreq_policy *policy)
 	target_cpu_speed[policy->cpu] = policy->cur;
 
 	/* FIXME: what's the actual transition time? */
-	policy->cpuinfo.transition_latency = 300 * 1000;
+	policy->cpuinfo.transition_latency = 40 * 1000;
 
 	policy->shared_type = CPUFREQ_SHARED_TYPE_ALL;
 	cpumask_copy(policy->related_cpus, cpu_possible_mask);
