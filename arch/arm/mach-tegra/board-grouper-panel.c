@@ -380,16 +380,13 @@ static struct tegra_dc_mode grouper_panel_modes[] = {
 {
 #ifdef CONFIG_GPU_OVERCLOCK
 #ifdef CONFIG_GPU_OC_446
-		/* 1280x800@62Hz */
-		.pclk = 74180000,
+		.pclk = 75000000,
 #endif
 #ifdef CONFIG_GPU_OC_484
-		/* 1280x800@63Hz */
-		.pclk = 77395348,
+		.pclk = 80000000,
 #endif
 #ifdef CONFIG_GPU_OC_520
-		/* 1280x800@65Hz */
-		.pclk = 81170731,
+		.pclk = 85000000,
 #endif
 #else
 	/* 1280x800@60Hz */
