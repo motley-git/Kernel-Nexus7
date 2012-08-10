@@ -59,7 +59,7 @@ static int suspend_index;
 static bool force_policy_max = 1;
 
 #define TEGRA3_OVERCLOCK
-#define TEGRA3_DYNAMIC_EDP_THRES_TEMP (67)
+#define TEGRA3_DYNAMIC_EDP_THRES_TEMP (68)
 static bool edp_enable = 1;
 
 static int force_policy_max_set(const char *arg, const struct kernel_param *kp)
