@@ -407,6 +407,13 @@ static void tegra_3x_sdhci_set_card_clock(struct sdhci_host *sdhci, unsigned int
 	if (clock && clock == sdhci->clock)
 		return;
 
+        /*
+         * Disable the card clock before disabling the internal
+         * clock to avoid abnormal clock waveforms.
+         */
+        clk = sdhci_readw(sdhci, SDHCI_CLOCK_CONTROL);
+        clk &= ~SDHCI_CLOCK_CARD_EN;
+        sdhci_writew(sdhci, clk, SDHCI_CLOCK_CONTROL);
 	sdhci_writew(sdhci, 0, SDHCI_CLOCK_CONTROL);
 
 	if (clock == 0)
@@ -1239,8 +1246,8 @@ static struct platform_driver sdhci_tegra_driver = {
 
 static int __init sdhci_tegra_init(void)
 {
-	int ret = 0;
 	printk(KERN_INFO "%s+ #####\n", __func__);
+	int ret = 0;
 	ret = platform_driver_register(&sdhci_tegra_driver);
 	printk(KERN_INFO "%s- #####\n", __func__);
 	return ret;

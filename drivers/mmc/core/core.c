@@ -1482,7 +1482,10 @@ static unsigned int mmc_mmc_erase_timeout(struct mmc_card *card,
 {
 	unsigned int erase_timeout;
 
-	if (card->ext_csd.erase_group_def & 1) {
+	if (arg == MMC_DISCARD_ARG ||
+		(arg == MMC_TRIM_ARG && card->ext_csd.rev >= 6)) {
+		erase_timeout = card->ext_csd.trim_timeout;
+	} else if (card->ext_csd.erase_group_def & 1) {
 		/* High Capacity Erase Group Size uses HC timeouts */
 		if (arg == MMC_TRIM_ARG)
 			erase_timeout = card->ext_csd.trim_timeout;
@@ -1757,6 +1760,14 @@ int mmc_can_trim(struct mmc_card *card)
 	return 0;
 }
 EXPORT_SYMBOL(mmc_can_trim);
+
+int mmc_can_discard(struct mmc_card *card)
+{
+	if (card->ext_csd.feature_support & MMC_DISCARD_FEATURE)
+		return 1;
+	return 0;
+}
+EXPORT_SYMBOL( mmc_can_discard);
 
 int mmc_can_secure_erase_trim(struct mmc_card *card)
 {
@@ -2217,7 +2228,7 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 	unsigned long flags;
 
 	printk("[mmc]mmc_pm_notify start\n");
-	MMC_printk("%s: mode %li, bus_resume_flags %u rescan_disable %d", mmc_hostname(host), mode, host->bus_resume_flags, host->rescan_disable); 
+	MMC_printk("%s: mode %d, bus_resume_flags %d rescan_disable %d", mmc_hostname(host), mode, host->bus_resume_flags, host->rescan_disable); 
 
 	switch (mode) {
 	case PM_HIBERNATION_PREPARE:
@@ -2245,7 +2256,7 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 		mmc_power_off(host);
 		mmc_release_host(host);
 		host->pm_flags = 0;
-		MMC_printk("mode %li ended", mode);
+		MMC_printk("mode %d ended", mode);
 		break;
 
 	case PM_POST_SUSPEND:

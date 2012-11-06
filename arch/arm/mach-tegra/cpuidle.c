@@ -80,7 +80,7 @@ static int tegra_idle_enter_lp3(struct cpuidle_device *dev,
 	return (int)us;
 }
 
-static bool lp2_in_idle __read_mostly = true;
+static bool lp2_in_idle __read_mostly = false;
 
 #ifdef CONFIG_PM_SLEEP
 static bool lp2_in_idle_modifiable __read_mostly = true;

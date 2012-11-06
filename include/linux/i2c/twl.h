@@ -863,7 +863,6 @@ static inline int twl4030charger_usb_en(int enable) { return 0; }
 #define TWL6030_REG_VUSB	46
 
 /* These are renamed in 6025 but same registers */
-#if 0
 #define TWL6025_REG_LDO2	48
 #define TWL6025_REG_LDO4	49
 #define TWL6025_REG_LDO3	50
@@ -878,7 +877,6 @@ static inline int twl4030charger_usb_en(int enable) { return 0; }
 #define TWL6025_REG_SMPS3	57
 #define TWL6025_REG_SMPS4	58
 #define TWL6025_REG_VIO		59
-#endif
 
 /* INTERNAL LDOs */
 #define TWL6030_REG_VRTC	47

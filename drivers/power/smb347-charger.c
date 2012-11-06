@@ -106,8 +106,13 @@
 /* Functions declaration */
 static int smb347_configure_charger(struct i2c_client *client, int value);
 static int smb347_configure_interrupts(struct i2c_client *client);
-extern unsigned int grouper_query_pcba_revision(void);
+extern unsigned int grouper_query_pcba_revision();
 extern int battery_callback(unsigned usb_cable_state);
+/* Enable or disable the callback for the battery driver. */
+#define TOUCH_CALLBACK_ENABLED 1
+#ifdef TOUCH_CALLBACK_ENABLED
+extern void touch_callback(unsigned cable_status);
+#endif
 
 static ssize_t smb347_reg_show(struct device *dev, struct device_attribute *attr, char *buf);
 
@@ -668,6 +673,10 @@ static int cable_type_detect(void)
 	if (gpio_get_value(gpio)) {
 			printk("INOK=H\n");
 			success = battery_callback(non_cable);
+#ifdef TOUCH_CALLBACK_ENABLED
+                   touch_callback(non_cable);
+#endif
+
 	} else {
 			printk("INOK=L\n");
 
@@ -682,14 +691,25 @@ static int cable_type_detect(void)
 					if(retval == APSD_CDP) {	//APSD resulted
 							printk("Cable: CDP\n");
 							success = battery_callback(ac_cable);
+#ifdef TOUCH_CALLBACK_ENABLED
+                                             touch_callback(ac_cable);
+#endif 
 					} else if(retval == APSD_DCP) {
 							printk("Cable: DCP\n");
 							success = battery_callback(ac_cable);
+#ifdef TOUCH_CALLBACK_ENABLED
+                                             touch_callback(ac_cable);
+#endif 
+
 					} else if(retval == APSD_OTHER) {
 							printk("Cable: OTHER\n");
 					} else if(retval == APSD_SDP) {
 							printk("Cable: SDP\n");
 							success = battery_callback(usb_cable);
+#ifdef TOUCH_CALLBACK_ENABLED
+                                             touch_callback(usb_cable);
+#endif 
+
 					} else
 							printk("Unkown Plug In Cable type !\n");
 				}else
@@ -758,7 +778,7 @@ static void inok_isr_work_function(struct work_struct *dat)
 static ssize_t smb347_reg_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	struct i2c_client *client = charger->client;
-	uint8_t config_reg[14], cmd_reg[1], status_reg[11];
+	uint8_t config_reg[14], cmd_reg[1], status_reg[10];
 	int i, ret = 0;
 
 	ret += i2c_smbus_read_i2c_block_data(client, smb347_CHARGE, 15, config_reg)
@@ -866,8 +886,7 @@ static int __devinit smb347_probe(struct i2c_client *client,
 
 	cable_type_detect();
 
-	ret = register_otg_callback( (callback_t)smb347_otg_status, charger);
-
+	ret = register_otg_callback(smb347_otg_status, charger);
 	if (ret < 0)
 		goto error;
 
@@ -885,7 +904,7 @@ static int __devexit smb347_remove(struct i2c_client *client)
 	return 0;
 }
 
-static int smb347_suspend(struct i2c_client *client, pm_message_t mesg)
+static int smb347_suspend(struct i2c_client *client)
 {
 	charger->suspend_ongoing = 1;
 	//cancel_delayed_work_sync(&charger->regs_dump_work);
@@ -908,7 +927,7 @@ static int smb347_resume(struct i2c_client *client)
 }
 
 
-static void smb347_shutdown(struct i2c_client *client)
+static int smb347_shutdown(struct i2c_client *client)
 {
 	int ret;
 	printk("smb347_shutdown+\n");
@@ -926,7 +945,7 @@ static void smb347_shutdown(struct i2c_client *client)
 			"otg..\n", __func__);
 
 	printk("smb347_shutdown-\n");
-	return;
+	return 0;
 }
 
 static const struct i2c_device_id smb347_id[] = {

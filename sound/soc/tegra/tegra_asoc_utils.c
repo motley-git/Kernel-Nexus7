@@ -31,7 +31,7 @@
 
 int g_is_call_mode;
 
-bool tegra_is_voice_call_active(void)
+bool tegra_is_voice_call_active()
 {
 	if (g_is_call_mode)
 		return true;
