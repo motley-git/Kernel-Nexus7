@@ -131,7 +131,7 @@ static int nct1008_get_temp(struct device *dev, long *pTemp)
 	*pTemp = max(temp_local_milli, temp_ext_milli);
 
 	/* Only log when temp is getting closer to Dynamic EDP limit */
-	if (MILLICELSIUS_TO_CELSIUS(*pTemp) > 56) 
+	if (MILLICELSIUS_TO_CELSIUS(*pTemp) > 65) 
 		pr_info("%s: ret temp=%liC \n", __func__, MILLICELSIUS_TO_CELSIUS(*pTemp));
 	return 0;
 error:
