@@ -142,6 +142,7 @@ static enum power_supply_property bq27541_properties[] = {
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_TECHNOLOGY,
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
+	POWER_SUPPLY_PROP_CURRENT_NOW,
 	POWER_SUPPLY_PROP_CAPACITY,
 	POWER_SUPPLY_PROP_TEMP,
 };
@@ -502,6 +503,20 @@ static int bq27541_get_psp(int reg_offset, enum power_supply_property psp,
 		}
 		BAT_NOTICE("voltage_now= %u uV\n", val->intval);
 	}
+
+	if (psp == POWER_SUPPLY_PROP_CURRENT_NOW) {
+		val->intval = rt_value;
+		/* Returns a signed 16-bit value in mA */
+		if (val->intval & 0x8000) {
+			/* Negative */
+			val->intval = ~val->intval & 0x7fff;
+			val->intval++;
+			val->intval *= -1;
+		}
+		val->intval *= 1000;
+		BAT_NOTICE("current_now= %d uA\n", val->intval);
+	}
+
 	if (psp == POWER_SUPPLY_PROP_STATUS) {
 		ret = bq27541_device->bat_status = rt_value;
 		static char *status_text[] = {"Unknown", "Charging", "Discharging", "Not charging", "Full"};
@@ -560,7 +575,7 @@ static int bq27541_get_psp(int reg_offset, enum power_supply_property psp,
 			}
 		}
 		bq27541_device->old_temperature = val->intval = ret;
-		BAT_NOTICE("temperature= %u (0.1¢XC)\n", val->intval);
+		BAT_NOTICE("temperature= %u (0.1ï¿½XC)\n", val->intval);
 	}
 	return 0;
 }
