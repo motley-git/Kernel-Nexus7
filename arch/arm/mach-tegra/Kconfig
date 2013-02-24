@@ -285,18 +285,17 @@ config GPU_OVERCLOCK
 	help
 	Choose y to overclock the GPU. 
 	If Off, clock speed is 416MHz.
-	If On, GPU clock speed can be selected.
+	If On, default GPU clock speed can be selected and then adjusted at runtime.
 
 choice
 
 	depends on GPU_OVERCLOCK
 	prompt "Maximum GPU Rate"
-	default GPU_OC_484
+	default GPU_OC_446
 	---help---
 	  Select the desired GPU overclock rate.
 
-	  If you are not sure what you are doing, leave this
-	  option alone!
+	  If not sure, leave the defaults.
 	config GPU_OC_446
 		bool "446 MHz"
 	config GPU_OC_484
